@@ -1,0 +1,14 @@
+---
+- name: Add monther user account 
+  user: 
+    name: monther
+    comment: Monther Yasin
+    uid: 1050
+    group: wheel
+
+- name: Add eron user account
+  user: 
+    name: eron
+    comment: Eric Ron
+    uid: 1051
+    group: wheel
