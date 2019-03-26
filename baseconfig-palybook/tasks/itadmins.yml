@@ -1,0 +1,32 @@
+---
+- name: Add itadmins group
+  group:
+    name: itadmins
+    state: present
+    gid: 1220
+    
+- name: Add sysadmins users
+  user:
+    name: "{{ item.name }}"
+    state: present
+    comment: "{{ item.comment }}"
+    uid: "{{ item.uid }}"
+    group: itadmins
+    shell: /bin/bash
+    createhome: yes
+    with_items: "{{ sysadmins }}"
+
+- name: Copy over sudoers file
+  copy: 
+    src: accounts/10_itadmins
+    dest: /etc/sudoers.d/10_itadmins
+    owner: root
+    group: root
+    mode: 0400
+    
+- name: add sudoers file instead of coping the file
+   lineinfile: 
+     dest: /etc/sudoers.d/10_itadmins
+     state: present
+     line: '%itadmins ALL=(ALL) NOPASSWD: ALL'
+     validate: 'visudo -cf %s'
