@@ -1,0 +1,22 @@
+---
+- name: Ensure iptables package is installled 
+  yum:
+    name: 
+      - iptables
+      - iptables-service
+    status: installed 
+- name: set iptables input policy
+  iptables: 
+    chain: INPUT
+    policy: DROP
+  iptables:
+    chain: OUTPUT
+    policy: ACCEPT
+- name: adding iptables rule
+  iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: 8080
+    jump: ACCEPT
+    rule_num: 5
+    
