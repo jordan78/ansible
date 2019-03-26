@@ -1,0 +1,13 @@
+---
+- name: Make sure the correct entries in /etc/hosts file
+  lineinfile: 
+    dest: /etc/hosts
+    regexp: '.*{{ ansible_fqdn }}'
+    line: "{{ ansible_default_ipv4.address }} {{ ansible_fqdn }} {{ ansible_hostname }}"
+    backrefs: yes 
+- name: Make sure correct localhost entry 
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '127.0.0.1'
+    line: "127.0.0.1  localhost  localhost.localdomain localhost4 localhost4.localdomain4"
+    backrefs: yes
