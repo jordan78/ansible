@@ -1,0 +1,25 @@
+---
+- name: Copy the correct iptables file over 
+  copy: 
+    src: "iptables/default_iptables"
+    dest: /etc/sysconfig/iptables
+- name: Install iptables and disable Firewalld for RHEL7 Servers
+  block:
+    - name: install iptables if not installed
+      yum: 
+        name: iptables
+        state: installed
+    - name: install iptables-services if not installed
+      yum: 
+        name: iptables-services
+        state: installed
+    - name: remove firewalld package
+      yum:
+        name: firewalld
+        state: removed 
+  when: (ansible_os_family == 'RedHat') and (ansible_distribution_major_version == '7')
+- name: Make sure iptables is running
+  service:
+    name: iptables
+    enabled: yes
+    state: restarted
