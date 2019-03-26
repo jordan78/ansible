@@ -1,0 +1,21 @@
+---
+- name: Install postfix package
+  yum: 
+    name: postfix
+    state: present 
+- name: Configure postfix
+  block:
+    - lineinfile:
+        path: /etc/postfix/main.cf
+        insertafter: '#relayhost  = \[gateway\.my\.domain\]'
+        line: 'relayhost = [smtp.mydomain.com]'
+    - lineinfile:
+        path: /etc/postfix/main.cf
+        regexp: '^inet_protocols'
+        line: 'inet_protocols = ipv4'
+ - name: restart postfix service
+   service: 
+     name: postfix
+     enabled: yes
+     state: restarted
+        
