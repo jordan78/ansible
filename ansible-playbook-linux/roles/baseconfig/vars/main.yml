@@ -1,1 +1,3 @@
 ---
+server_proxy_hostname: proxy.mydomain.com
+server_proxy_port: '3128'
