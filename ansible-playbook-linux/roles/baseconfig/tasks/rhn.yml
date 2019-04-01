@@ -1,1 +1,23 @@
 ---
+- name: Ensure old Katello Package is removed
+  yum: 
+    name: katello-ca-consumer-rhn.northcarolina.edu-1.0-1.noarch
+    state: absent
+
+- name: install latest katello from satellite server
+  yum: 
+    name: https://plx-rhnsat.uncg.edu/pub/katello-ca-consumer-latest.noarch.rpm
+    state: present
+    validate_certs: no
+
+- name: Register with UNCG Satellite Server
+  redhat_subscription:
+     state: present
+     org_id: UNC_Greensboro
+     activationkey: UNCG-RHEL7
+     rhsm_baseurl: https://plx-rhnsat.uncg.edu/pulp/repos
+     server_insecure: true
+     auto_attach: true
+     server_proxy_hostname: "{{ uncg_proxy_host | default('') }}"
+     server_proxy_port: "{{ uncg_proxy_port | default('') }}"
+     
