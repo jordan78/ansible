@@ -1,0 +1,24 @@
+---
+- name: setup kerberos for rhel 7
+block:
+  - yum: name=krb5-devel state=latest
+  - yum: name=krb5-libs  state=latest
+  - yum: name=krb5-workstation state=latest
+  - yum: name=pam state=latest
+  - yum: name=pam_krb5 state=latest
+  - copy: src=krb5.conf  dest=/etc/krb5.conf
+  - copy: src=password-auth  dest=/etc/pam.d/password-auth
+  - copy: src=system-auth dest=/etc/pam.d/system-auth
+  
+  - stat: path='/etc/pam.d/system-auth-ac'
+    register: file_details
+  - file: src='/etc/pam.d/system-auth'  dest='/etc/pam.d/system-auth-ac' state=link
+    when: file_details.stat.exists == false
+    
+  - stat: path = '/etc/pam.d/password-auth-ac'
+    register: file_details
+  - file: src='/etc/pam.d/password-auth' dest='/etc/pam.d/password-auth-ac' state=link
+    when: file_details.stat.exists == false
+ when: (ansible_os_family == "RedHat") and (ansible_distribution_major_version == '7')
+
+  
