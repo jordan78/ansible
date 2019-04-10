@@ -1,0 +1,22 @@
+---
+- hosts: all
+  tasks:
+
+  - name: Ensure iptables is present
+    yum: name=iptables,iptables-services state=present
+
+  - name: copy iptables template 
+    template: 
+       src:  ../templates/iptables.j2
+       dest: /etc/sysconfig/iptables
+       owner: root
+       group: root
+       mode: 0744 
+    notify: 
+      - restart iptables 
+
+  handlers: 
+    - name: restart iptables
+      service:
+         name: iptables
+         state: restarted
