@@ -13,6 +13,11 @@
      state: started
      enabled: yes 
 
+#  - name: reset firewalld to default 
+#     file:
+#       src:  /usr/lib/firewalld/zones/public.xml
+#       dest: /etc/firewalld/public.xml
+
   - name: append standard services 
     firewalld:
      service: "{{ item }}"

@@ -1,6 +1,12 @@
 ---
 - hosts: all
   tasks:
+  
+  - name: Disable Firewalld 
+    service: firewalld 
+      name: firewalld
+      state: stopped
+      enabled: false 
 
   - name: Ensure iptables is present
     yum: name=iptables,iptables-services state=present
