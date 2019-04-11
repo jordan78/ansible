@@ -1,0 +1,55 @@
+---
+- hosts: all
+  tasks:
+  
+  - name: Copy Splunk RPM to server 
+    file: 
+      src: files/splunkforwarder.rpm
+      dest: /tmp/splunkforwarder.rpm
+      replace: true
+  
+  -name: Install splunk forwarder 
+   yum:
+    name: /tmp/splunkforwarder.rpm
+    state: latest 
+
+  - name: Configure Splunk User
+    user: 
+      name: splunk
+      state: present 
+      home: /opt/splunkforwarder
+
+  - name: Configure splunkforwarder password
+    file:
+      src: files/passwd
+      dest: /opt/splunkforwarder/etc/passwd
+  
+  - name: Configure splunkforwarder deployment server
+    file:
+      src: files/deploymentclient.conf
+      dest: /opt/splunkforwarder/etc/system/local/deploymentclient.conf
+  
+  - name: Configure splunkforwarder launch 
+    file:
+      src: files/splunk-launch.conf
+      dest: /opt/splunkforwarder/etc/splunk-launch.conf
+  
+  - name: Accept Splunk License Aggrement 
+    raw: '/opt/splunkforwarder/bin/splunk start --accept-license --answer-yes'
+  
+  - name: enable splunk forwarder
+    raw: '/opt/splunkforwarder/bin/splunk enable boot-start -user splunk'
+  
+  - name: Change Permission 
+    file: 
+     path: /opt/splunkforwarder
+     owner: splunk
+
+  - name: Setfacl to allow splunk access to var log messages 
+    acl:
+     path: /var/log/messages
+     entity: splunk
+     etype: user
+     permissions: rx
+     state: present
+     
