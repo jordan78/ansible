@@ -3,12 +3,11 @@
   tasks:
   
   - name: Copy Splunk RPM to server 
-    file: 
+    copy: 
       src: files/splunkforwarder.rpm
       dest: /tmp/splunkforwarder.rpm
-      replace: true
   
-  -name: Install splunk forwarder 
+  - name: Install splunk forwarder 
     yum:
      name: /tmp/splunkforwarder.rpm
      state: latest 
@@ -20,17 +19,17 @@
       home: /opt/splunkforwarder
 
   - name: Configure splunkforwarder password
-    file:
+    copy:
       src: files/passwd
       dest: /opt/splunkforwarder/etc/passwd
   
   - name: Configure splunkforwarder deployment server
-    file:
+    copy:
       src: files/deploymentclient.conf
       dest: /opt/splunkforwarder/etc/system/local/deploymentclient.conf
   
   - name: Configure splunkforwarder launch 
-    file:
+    copy:
       src: files/splunk-launch.conf
       dest: /opt/splunkforwarder/etc/splunk-launch.conf
   
