@@ -9,9 +9,9 @@
       replace: true
   
   -name: Install splunk forwarder 
-   yum:
-    name: /tmp/splunkforwarder.rpm
-    state: latest 
+    yum:
+     name: /tmp/splunkforwarder.rpm
+     state: latest 
 
   - name: Configure Splunk User
     user: 
@@ -52,4 +52,3 @@
      etype: user
      permissions: rx
      state: present
-     
