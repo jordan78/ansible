@@ -5,6 +5,11 @@
      name: notepadplusplus
      state: present
      
+- name: Ensure 7zip is installed
+  win_chocolatey:
+     name: 7zip.install
+     state: present 
+     
 - name: Create local admin and place it in Administrator group
   win_user:
      name: localadmin
