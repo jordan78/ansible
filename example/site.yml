@@ -1,0 +1,9 @@
+---
+- hosts: all
+# hosts: webserver:dbservers 
+  sudo: yes
+  gather_facts: no
+  roles:
+  - common
+- include: webserver.yml
+- include: dbserver.yml
