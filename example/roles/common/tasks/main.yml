@@ -1,1 +1,4 @@
-
+---
+- include: aide.yml
+- include: syslog.yml
+- include: ntp.yml
