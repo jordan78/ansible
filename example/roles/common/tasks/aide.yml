@@ -1,1 +1,44 @@
+---
+- hosts: all
+  tasks:
 
+  - name: Ensure aide is installed
+    yum:
+      name: aide
+      state: present
+    when: ansible_os_family == "RedHat"
+    register: aide_installed
+
+  - name: Configure Aide
+    template:
+      src: "templates/aide.conf.j2"
+      dest: "/etc/aide.conf"
+
+  - name: Initialize Aide Database
+    command: aide -i
+    register: aide_initialized
+    when: " 'Complete!' in aide_installed"
+
+  - name: Check for existing aide database
+    stat:
+      path: "/var/lib/aide/aide.db.new.gz"
+    register: aide_db_new
+
+  - name: "Move new aide database into place"
+    command: "mv aide.db.new.gz aide.db.gz"
+    args:
+      chdir: "/var/lib/aide"
+    when: aide_db_new.stat.exists
+
+  - name: "setup Aide cron job"
+    cron:
+      name: aide daily check
+      backup: "yes"
+      user: "root"
+      state: "present"
+      minute: "0"
+      hour:  "1"
+      day: "*"
+      month: "*"
+      weekday: "*"
+      job: "aide | awk {print} | logger -p local1.debug"
