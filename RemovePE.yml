@@ -1,0 +1,25 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+
+  - name: Stop PE Service
+    service: name=puppet state=stopped enabled=no
+
+  - name: Remove PE Package
+    yum: name=puppet-agent state=absent
+
+  - name: Clean out the puppet directories
+    file:
+      name: "{{ item }}"
+      state: absent
+    with_items:
+      - /etc/puppetlabs
+      - /opt/puppetlabs
+      - /etc/yum.repos.d/pe_repo.repo
+
+  - name: Remove the pe-puppet user
+    user:
+      name: pe-puppet
+      state: absent
+      remove: yes 
