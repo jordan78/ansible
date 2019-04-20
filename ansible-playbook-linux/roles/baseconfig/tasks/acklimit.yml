@@ -1,8 +1,7 @@
 ---
-- name: Add line to the end of sysctl file
-  lineinfile:
-     path: /etc/sysctl.conf
-     line: 'net.ipv4.tcp_challenge_ack_limit = 999999999'
-
-- name: Update sysctl 
-  command: sysctl -p
+# tasks file for challenge_acklimit
+- sysctl: 
+    name: net.ipv4.tcp_challenge_ack_limit
+    value: '999999999'
+    sysctl_file: /etc/sysctl.conf
+    reload: yes
