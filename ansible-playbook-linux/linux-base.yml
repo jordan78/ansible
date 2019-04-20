@@ -1,15 +1,5 @@
 ---
 - hosts: all
-  gather_facts: True
-  pre_tasks:
-     - name: Assign Environment Dev
-       set_fact:
-         os_env: 'dev'
-       when: ansible_hostname is match('dlx-.+') or ansible_hostname is match('slx-.+')
-  
-  
-     - name: Display Env fact
-       debug:
-         msg: "Environment fact is {{ os_env }}"
-         
+  roles:
+    - baseconfig
    
