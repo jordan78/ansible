@@ -1,19 +1,14 @@
 ---
-  tasks:
-  - name: Install apache packages 
-    yum:
-      name: httpd
-      state: present
-  - name: ensure httpd is running
-    service:
-      name: httpd 
-      state: started
-  - name: Open port 80 for http access
-    firewalld:
-      service: http
-      permanent: true
-      state: enabled
-  - name: Restart the firewalld service to load in the firewall changes
-    service: 
-      name: firewalld 
-      state: restarted
+- name: Install Apache 
+  yum: name=httpd state=present
+  
+- name: Start Apache
+  service: name=httpd state=started enabled=yes
+  
+- name: Deploy Configuration File
+  template: src=httpd.j2 dest=/etc/httpd/conf/httpd.conf
+  notify:
+  - Restart Apache
+  
+- name: Copy Site Files
+  template: src=index.j2 dest={{ doc_root }}/index.html
