@@ -1,6 +1,4 @@
 ---
-- name: include tasks for base config 
-  include_tasks:
-     - firewall
-     - acklimit
-     - user
+  - include_tasks: firewall
+  - include_tasks: acklimit
+  - include_tasks: user
