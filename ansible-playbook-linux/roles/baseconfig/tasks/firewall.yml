@@ -1,5 +1,35 @@
 ---
-- firewalld:
-    service: https
-    permanent: true
-    state: enabled
+- name: firewall configuration 
+
+  tasks:
+
+  - name: Install firewalld 
+    yum:
+     name: firewalld
+     state: present 
+    
+  - name: enable Firewalld
+    service:
+     name: firewalld
+     state: started
+     enabled: yes 
+
+  - name: append standard services 
+    firewalld:
+     service: "{{ item }}"
+     permanent: yes
+     state: enabled
+    with_items:
+       - ldaps
+       - kerberos
+       - dns
+       - ntp
+       - ssh
+    notify:
+     - restart firewalld
+ 
+  handlers:
+      - name: restart firewalld
+        service: 
+           name: firewalld 
+           state: restarted
