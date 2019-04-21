@@ -25,6 +25,8 @@
        - dns
        - ntp
        - ssh
+       - http
+       - https
     notify:
      - restart firewalld
  
