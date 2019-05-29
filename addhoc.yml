@@ -1,0 +1,10 @@
+---
+- name: get an ip address
+  hosts: localhost 
+  gather_facts: True
+  connection: local
+  
+  tasks:
+  - name: add a debug statement   
+    debug: 
+      msg: "{{ ansible_default_ipv4.address }}"
