@@ -1,0 +1,61 @@
+---
+# create a new VM from a template
+
+- name: VM from template
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  vars:
+    vm_cluster: ''
+    vm_datacenter: 'Production'
+    vm_datastore: ''
+    vm_network: ''
+    vm_folder: ''
+    vm_resource_pool: ''
+    vm_memory_gb: 4
+    vm_cpu_count: 1
+
+
+    sandbox_vms:
+      - name: ansible1
+        template: RHEL_Template
+        ip: 
+        netmask: 
+        gateway: 
+      - name: sansible2
+        template: RHELTemplate
+        ip: 
+        netmask: 
+        gateway: 
+
+  tasks:
+    - name: Create VM from template
+      vmware_guest:
+        validate_certs: False
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        cluster: "{{ vm_cluster }}"
+        datacenter: "{{ vm_datacenter }}"
+        name: "{{ sandbox_vms.name }}"
+        template: "{{ sandbox_vms.template }}"
+        datastore: "{{ vm_datastore }}"
+        networks:
+        - name: "{{ vm_network }}"
+          type: static
+          ip: "{{ sandbox_vms.ip }}"
+          netmask: "{{ sandbox_vms.netmask }}"
+          gateway: "{{ sandbox_vms.gateway }}"
+        hardware:
+          memory_mb: "{{ vm_memory_gb * 1024 }}"
+          num_cpus: "{{ vm_cpu_count }}"
+          num_cpu_cores_per_socket: 1
+          hotadd_cpu: True
+          hotremove_cpu: True
+          hotadd_memory: True
+        folder: "{{ vm_folder }}"
+        resource_pool: "{{ vm_resource_pool }}"
+        wait_for_ip_address: True
+        state: poweredon
+      with_items: "{{ sandbox_vms }}"
+      register: newvm
