@@ -5,3 +5,8 @@
     - name: Print all Facts
     debug: 
       var: ansible_facts
+      
+    - name: Print IP address
+    debug:
+      var: >
+         The default IP address of {{ ansible_facts.fqdn }} is {{ ansible_facts.default_ipv4.address }}
