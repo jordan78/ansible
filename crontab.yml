@@ -1,0 +1,7 @@
+## clean up crontab
+---
+# tasks remove puppet entries in crontab
+- hosts: all
+  tasks:
+    - name: Remove aide
+      shell:  crontab -l | grep -v puppet | crontab
