@@ -1,0 +1,19 @@
+- src: geerlingguy.redis
+  version: "1.5.0"   #otherwise latest will be installed
+  name: redis_prod
+  
+ ## Install git-based repository using https
+ - src: https://gitlab.com/guardianproject-ops/ansible-nginx-acme.git
+   scm: git
+   version: 5559959
+   name: nginx-acme
+ 
+## Install From git repostiory using ssh
+- src: git@gitlab.com:guardianproject-ops/ansible-nginx-acme.git
+  scm: git
+  version: master
+  name: nginx-acme-ssh
+  
+## Install from tar ball.
+- src: file:///opt/local/roles/myrole.tar
+  name: myrole
