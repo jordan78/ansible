@@ -1,0 +1,25 @@
+---
+- name: Check if VM provisioning file exists
+  stat:
+    path: /var/provisioned
+  register: provisioned_file
+
+- name: Run yum updates on newly provisioned VMs
+  block:
+  - name: Update packages for initial provisioning
+    yum: name='*' state=latest update_cache=yes
+    register: yumresult
+  - name: Remove provisioned_file
+    file:
+      state: absent
+      path: /var/provisioned
+  - name: Create directory for Ansible custom facts
+    file:
+      state: directory
+      recurse: yes
+      path: /etc/ansible/facts.d
+  - name: Create custom fact for provisioned date
+    template:
+      src: provisioned.fact
+      dest: /etc/ansible/facts.d
+  when: provisioned_file.stat.exists == True
