@@ -1,24 +1,18 @@
 ---
-- name: Disable old gluster repos
-  ini_file:
-      dest: /etc/yum.repos.d/CentOS-Gluster-4.1.repo
-      section: "{{ item }}"
-      option: enabled
-      value: 0
-   with_items:
-      - centos-gluster41
-      - centos-gluster41-test
-   when:
-      - (ansible_distribution == "CentOS")
+- hosts: localhost
 
+  tasks:
+  - name: Install Gluster 5
+    yum_repository:
+      name: glusterfs-5
+      baseurl: http://buildlogs.centos.org/centos/7/storage/x86_64/gluster-5
+      gpgcheck: no
+      description: GlusterFS 5 YUM REPO
+      state: present
+      enabled: yes
 
-- name: Install Gluster 5
-  yum:
-    name: http://buildlogs.centos.org/centos/7/storage/x86_64/gluster-5/
-    state: present
-    validate_certs: no
+  - name: Install Gluster
+    yum:
+      name: glusterfs-server
+      state: present
 
-- name: Upgrade Gluster
-  yum:
-    name: glusterfs
-    state: latest
