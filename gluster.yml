@@ -5,7 +5,7 @@
   - name: Install Gluster 5
     yum_repository:
       name: glusterfs-5
-      baseurl: http://buildlogs.centos.org/centos/7/storage/x86_64/gluster-5
+      baseurl: http://buildlogs.centos.org/centos/7/storage/x86_64/gluster-5/
       gpgcheck: no
       description: GlusterFS 5 YUM REPO
       state: present
@@ -16,3 +16,30 @@
       name: glusterfs-server
       state: present
 
+  - name: Start Glusterd Service
+    service:
+      name: glusterd
+      state: started
+
+  - name: enable Gluster Service
+    service:
+      name: glusterd
+      enabled: yes
+
+  - name: open firewall ports
+    firewalld:
+      port: 24007-24008/tcp
+      permanent: yes
+      state: enabled
+
+  - name: Create Brick Volume
+    gluster_volume:
+      state: present
+      name: data
+      bricks: /bricks/
+      options:
+        performance.cache-size: 256MB
+
+
+
+[root@dockerhost ansible]#
