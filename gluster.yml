@@ -39,7 +39,3 @@
       bricks: /bricks/
       options:
         performance.cache-size: 256MB
-
-
-
-[root@dockerhost ansible]#
