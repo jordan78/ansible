@@ -35,3 +35,25 @@
         wait_for_ip_address: True
         state: poweredon
       register: newvm
+   
+      - name: Add New VM to to in-memory inventory 
+        add_host:
+          name: "{{ vm_name }}"
+          groups: tmpgrp 
+        
+      - name: Wait for SSH Connection
+        wait_for:
+          host: "{{ vm_name }}"
+          port: 22
+          delay: 60
+          timeout: 180
+          state: started
+
+## Deploy baseconfig to VM from in-memory inventory 
+- name: Deploy base config to newly created VM. 
+  hosts: tmpgrp
+  gather_facts: True
+  tasks:
+    - name: Creating new user
+      user:
+        name: mynewuser
