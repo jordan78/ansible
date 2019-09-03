@@ -1,0 +1,82 @@
+---
+- name: Install sssd packages for RHEL7
+  yum:
+    name:
+      - sssd
+      - realmd
+      - oddjob
+      - oddjob-mkhomedir
+      - adcli
+      - samba-common
+      - samba-common-tools
+      - krb5-workstation
+      - openldap-clients
+      - policycoreutils-python
+
+- name: Install pexpect using pip
+  pip:
+    name: pexpect
+
+- name: Copy krb5.conf Config
+  copy:
+    src: auth/krb5.conf_domain
+    dest: /etc/krb5.conf
+
+- name: Join system to AD and add the computer object in the Linux OU
+  expect:
+    command: /bin/bash -c "/usr/sbin/realm join --user={{ bind_user }} example.com"
+    responses:
+      Password for *: "{{ bind_password }}"
+
+- name: Update sssd.conf
+  block:
+  - name: Add dynamic_dns to sssd.conf
+    blockinfile:
+      path: /etc/sssd/sssd.conf
+      insertafter: 'access_provider = ad'
+      block: |
+        dyndns_update = true
+        dyndns_refresh_interval = 43200
+        dyndns_update_ptr = true
+        dyndns_ttl = 3600
+    register: sssd1
+
+  - name: Disable cached creds sssd.conf
+    replace:
+      path: /etc/sssd/sssd.conf
+      regexp: 'cache_credentials = True'
+      replace: 'cache_credentials = False'
+    register: sssd2
+
+  - name: Add default_domain_suffix to sssd.conf
+    lineinfile:
+      dest: /etc/sssd/sssd.conf
+      line: 'default_domain_suffix = example.com'
+      insertafter: '^\[sssd\]'
+    register: sssd3
+
+- name: Restart if sssd.conf changed
+  notify: restart sssd
+  when: sssd1.changed or sssd2.changed or sssd3.changed
+
+#- name: Allow the LinuxAdmins AD group to logon to the system
+#  command: /bin/bash -c "/usr/sbin/realm permit -g systems_groups@example.com"
+- name: Copy over domain sudoers file
+  copy:
+    src: accounts/Systems
+    dest: /etc/sudoers.d/Systems
+    owner: root
+    group: root
+    mode: 0400
+
+
+- name: Configure firewall rules for kerberos/ldap
+  iptables_raw:
+    name: auth_rules
+    keep_unmanaged: yes
+    backup: yes
+    weight: 44
+    rules: |
+      -A INPUT -p tcp --dport 40000:60000 -s 10.30.16.0/24 -j ACCEPT
+      -A INPUT -p udp --dport 40000:60000 -s 10.30.16.0/24 -j ACCEPT
+      -A INPUT -s 192.168.1.0/24 -p tcp -m tcp --sport 636 -m state --state ESTABLISHED -j ACCEPT
