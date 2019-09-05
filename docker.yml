@@ -1,0 +1,51 @@
+---
+- name: Ensure Docker is installed
+  yum: 
+    name: docker
+    state: installed
+- name: Ensure python setup-tools is installed
+  yum:
+    name: python-setuptools
+    state: installed
+- name: Make sure registries started and enabled 
+  service: 
+    name: registries
+    state: started
+- name: Insert proxy line in file
+  blockinfile:
+    path: /etc/sysconfig/docker
+    block: |
+      HTTP_PROXY=proxy.example.com
+      HTTS_PROXY=proxy.example.com
+- name: Configure docker storage device if variable stg_conf is true
+  block:
+    - lineinfile:
+        path: /etc/sysconfig/docker-storage-setup
+        line: 'STORAGE_DRIVER=devicemapper'
+        regexp: '^STORAGE_DRIVER=.*$'
+        backrefs: yes
+    - lineinfile:
+        path: /etc/sysconfig/docker-storage-setup
+        line: 'VG=vgdocker'
+    - shell: "{{ item }}"
+      with_items:
+        - "/usr/sbin/pvcreate {{ device }}"
+        - "/usr/sbin/vgcreate vgdocker {{ device }}"
+    - service: name=docker state=stopped
+    - command: "/sbin/vgdisplay vgdocker"
+      register: command_result
+    - name: provision storage 
+      block:
+        - file: path="/var/lib/docker" state=absent
+        - shell: "/bin/docker-storage-setup"
+        - service: name=docker state=started enabled=yes
+      when: command_result.rc == 0
+  when: stg_conf
+
+- name: Start docker service when stg_conf is false
+# this should rarely be done, except for test/dev systems where
+# dedicated storage is not needed
+# docker automatically provisions storage when first started up
+# with default settings
+  service: name=docker state=started enabled=yes
+  when: not stg_conf
