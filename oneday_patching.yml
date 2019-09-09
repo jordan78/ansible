@@ -1,0 +1,44 @@
+---
+- hosts: '{{ groupname }}'
+  tasks:
+  - name: Patch Database Servers
+    import_role:
+      name: yum_update
+      tasks_from: database_servers.yml
+  
+  - pause:
+      minutes: 5
+  
+  - name: Patch Application Servers Load Balance Group 1
+    import_role:
+      name: yum_update
+      tasks_from: appserver2.yml
+      
+  - pause:
+      minutes: 2
+  
+  - name: Patch Application Servers Load Balance Group 2
+    import_role:
+      name: yum_update
+      tasks_from: appservers2.yml
+  
+  - name: Check if all servers are patched
+    import_role:
+      name: yum_update.yml
+      tasks_from: check_update.yml
+      
+  - name: Check if web applications are up
+    uri: 
+      url: https://mywebsite.domain.com
+      return_content: yes
+      status_code: 200
+    register: webresult
+    until: webresult.status == 200
+    retries: 3
+    delay: 20
+    
+  - name: Check if Web App is Up
+    uri:
+      url: https://mobileweb.example.com
+      
+    
