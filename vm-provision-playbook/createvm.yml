@@ -7,7 +7,7 @@
   tasks:
   - name: Create VM and add to host inventory
     include: provisioning-tasks.yml
-    with_items: "{{ vms }}"
+    with_items: "{{ sandbox_vms }}"
 
 - hosts: NewVMs
   become: True
