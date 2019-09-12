@@ -1,0 +1,19 @@
+---
+
+- hosts: localhost
+  gather_facts: false
+  connection: local
+
+  tasks:
+  - name: Create VM and add to host inventory
+    include: provisioning-tasks.yml
+    with_items: "{{ vms }}"
+
+- hosts: NewVMs
+  become: True
+  tasks:
+  - debug:
+      msg: "{{ playbook_dir }}/../ansible-playbook-linux-base/linux_base.yml"
+
+- name: Import base_config
+  import_playbook: "{{ playbook_dir }}/../ansible-playbook-linux-base/linux_base.yml"
