@@ -1,0 +1,5 @@
+---
+alias_pattern: "{{ config.name }}"
+groupby_custom_field: True
+include_tags: True
+custom_field_group_prefix: ""
