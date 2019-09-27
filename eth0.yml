@@ -1,0 +1,46 @@
+---
+- name: Configure DNS to point to Windows DNS
+  block:
+    - stat: path=/etc/sysconfig/network-scripts/ifcfg-eth0
+      register: checkfile
+    - name: Configure Windows DNS1
+      lineinfile:
+        dest: /etc/sysconfig/network-scripts/ifcfg-eth0
+        regexp: 'DNS1='
+        line: "DNS1=10.35.1.4"
+        backrefs: yes
+      when: checkfile.stat.exists == True
+
+    - name: Configure Windows DNS2
+      lineinfile:
+        dest: /etc/sysconfig/network-scripts/ifcfg-eth0
+        regexp: 'DNS2='
+        line: "DNS2=10.35.1.1"
+        backrefs: yes
+      when: checkfile.stat.exists == True
+
+    - name: Configure domain search suffix
+      lineinfile:
+        dest: /etc/sysconfig/network-scripts/ifcfg-eth0
+        regexp: 'DOMAIN="?somedomain.com"?'
+        line: 'DOMAIN="example.com'
+        backrefs: yes
+      when: checkfile.stat.exists == True
+
+    - stat: path=/etc/dhclient-eth0.conf
+      register: dhcheckfile
+    - name: Remove dns server overrides dhcp client
+      lineinfile:
+        dest: /etc/dhclient-eth0.conf
+        regexp: 'supersede domain-name-servers 192.168.1.1;'
+        line: ''
+        backrefs: yes
+      when: dhcheckfile.stat.exists == True
+
+    - name: Temp CAMPUS Configure domain search suffix for dhcp client override
+      lineinfile:
+        dest: /etc/dhclient-eth0.conf
+        regexp: 'supersede domain-name "somedomain.com";'
+        line: 'supersede domain-name "example.com";'
+        backrefs: yes
+      when: dhcheckfile.stat.exists == True
