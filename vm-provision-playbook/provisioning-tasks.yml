@@ -11,8 +11,8 @@
       datastore: "{{ vm_datastore }}"
       customization:
         dns_servers:
-          - 10.30.x.x
-          - 10.30.x.x
+          - x..x.x
+          - x.x.x.x
         dns_suffix:
           - example.com
           - ad.example.com
